@@ -1,0 +1,26 @@
+apiVersion: v2
+name: money-system
+description: Umbrella chart for Money Management System with AI Chatbot
+version: 0.1.0
+type: application
+
+dependencies:
+  - name: aichat-bot
+    version: "0.1.0"
+    repository: "file://../charts/aichat-bot"
+    condition: aichat-bot.enabled
+  
+  - name: calculate-money
+    version: "0.1.0"
+    repository: "file://../charts/calculate-money"
+    condition: calculate-money.enabled
+  
+  - name: mongodb
+    version: "12.1.31"
+    repository: "https://charts.bitnami.com/bitnami"
+    condition: global.mongodb.enabled
+  
+  - name: redis
+    version: "17.11.3"
+    repository: "https://charts.bitnami.com/bitnami"
+    condition: global.redis.enabled

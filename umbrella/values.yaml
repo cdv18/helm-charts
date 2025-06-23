@@ -1,0 +1,115 @@
+# Global configurations
+global:
+  environment: production
+  domain: example.com
+  
+  mongodb:
+    enabled: true
+    auth:
+      rootPassword: "changeme"
+      username: "money"
+      password: "changeme"
+      database: "money_calculator"
+  
+  redis:
+    enabled: true
+    auth:
+      password: "changeme"
+
+# AI Chatbot configuration
+aichat-bot:
+  enabled: true
+  
+  image:
+    repository: your-registry/aichat-bot
+    tag: latest
+  
+  config:
+    calculateMoney:
+      apiUrl: http://money-system-calculate-money/api/v1
+      timeoutSeconds: 30
+  
+  ingress:
+    enabled: true
+    className: nginx
+    annotations:
+      nginx.ingress.kubernetes.io/rewrite-target: /
+    hosts:
+      - host: chat.example.com
+        paths:
+          - path: /
+            pathType: Prefix
+
+# Money Calculator configuration
+calculate-money:
+  enabled: true
+  
+  image:
+    repository: your-registry/calculate-money
+    tag: latest
+  
+  config:
+    jwt:
+      secretKey: "your-secret-key-here"
+      algorithm: "HS256"
+      accessTokenExpireMinutes: 30
+    
+    server:
+      cors:
+        allowOrigins:
+          - "https://money.example.com"
+  
+  ingress:
+    enabled: true
+    className: nginx
+    annotations:
+      nginx.ingress.kubernetes.io/rewrite-target: /
+    hosts:
+      - host: api.money.example.com
+        paths:
+          - path: /
+            pathType: Prefix
+  
+  frontend:
+    enabled: true
+    image:
+      repository: your-registry/calculate-money-frontend
+      tag: latest
+    
+    config:
+      apiBaseUrl: "https://api.money.example.com/api/v1"
+      env: "production"
+    
+    ingress:
+      enabled: true
+      className: nginx
+      hosts:
+        - host: money.example.com
+          paths:
+            - path: /
+              pathType: Prefix
+
+# MongoDB configuration
+mongodb:
+  architecture: standalone
+  auth:
+    rootPassword: "changeme"
+    username: "money"
+    password: "changeme"
+    database: "money_calculator"
+  
+  persistence:
+    enabled: true
+    size: 10Gi
+
+# Redis configuration
+redis:
+  architecture: standalone
+  auth:
+    enabled: true
+    password: "changeme"
+  
+  master:
+    persistence:
+      enabled: true
+      size: 5Gi

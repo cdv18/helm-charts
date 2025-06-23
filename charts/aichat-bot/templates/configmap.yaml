@@ -1,0 +1,20 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "aichat-bot.fullname" . }}-config
+  labels:
+    {{- include "aichat-bot.labels" . | nindent 4 }}
+data:
+  config.yaml: |
+    llm:
+      model: {{ .Values.config.llm.model }}
+      temperature: {{ .Values.config.llm.temperature }}
+      max_tokens: {{ .Values.config.llm.maxTokens }}
+    
+    category_manager:
+      api_url: {{ .Values.config.calculateMoney.apiUrl }}
+      timeout_seconds: {{ .Values.config.calculateMoney.timeoutSeconds }}
+    
+    server:
+      port: {{ .Values.service.port }}
+      host: "0.0.0.0"

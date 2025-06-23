@@ -1,0 +1,80 @@
+global:
+  environment: development
+  domain: dev.example.com
+
+  mongodb:
+    enabled: true
+    auth:
+      rootPassword: "dev-password"
+      username: "money"
+      password: "dev-password"
+      database: "money_calculator_dev"
+
+  redis:
+    enabled: true
+    auth:
+      password: "dev-password"
+
+aichat-bot:
+  enabled: true
+  replicaCount: 1
+  
+  resources:
+    limits:
+      cpu: 200m
+      memory: 256Mi
+    requests:
+      cpu: 100m
+      memory: 128Mi
+  
+  ingress:
+    hosts:
+      - host: chat.dev.example.com
+        paths:
+          - path: /
+            pathType: Prefix
+
+calculate-money:
+  enabled: true
+  replicaCount: 1
+  
+  resources:
+    limits:
+      cpu: 200m
+      memory: 256Mi
+    requests:
+      cpu: 100m
+      memory: 128Mi
+  
+  config:
+    jwt:
+      secretKey: "dev-secret-key"
+  
+  ingress:
+    hosts:
+      - host: api.money.dev.example.com
+        paths:
+          - path: /
+            pathType: Prefix
+  
+  frontend:
+    enabled: true
+    config:
+      apiBaseUrl: "https://api.money.dev.example.com/api/v1"
+      env: "development"
+    
+    ingress:
+      hosts:
+        - host: money.dev.example.com
+          paths:
+            - path: /
+              pathType: Prefix
+
+mongodb:
+  persistence:
+    size: 5Gi
+
+redis:
+  master:
+    persistence:
+      size: 1Gi

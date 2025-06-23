@@ -1,0 +1,167 @@
+global:
+  environment: production
+  domain: example.com
+
+  mongodb:
+    enabled: true
+    auth:
+      # Sẽ được ghi đè bằng Secret Management trong production
+      rootPassword: "${MONGODB_ROOT_PASSWORD}"
+      username: "money"
+      password: "${MONGODB_PASSWORD}"
+      database: "money_calculator"
+
+  redis:
+    enabled: true
+    auth:
+      password: "${REDIS_PASSWORD}"
+
+aichat-bot:
+  enabled: true
+  replicaCount: 3
+  
+  resources:
+    limits:
+      cpu: 1000m
+      memory: 1Gi
+    requests:
+      cpu: 500m
+      memory: 512Mi
+  
+  ingress:
+    enabled: true
+    className: nginx
+    annotations:
+      nginx.ingress.kubernetes.io/rewrite-target: /
+      cert-manager.io/cluster-issuer: letsencrypt-prod
+    hosts:
+      - host: chat.example.com
+        paths:
+          - path: /
+            pathType: Prefix
+    tls:
+      - secretName: chat-tls
+        hosts:
+          - chat.example.com
+
+calculate-money:
+  enabled: true
+  replicaCount: 3
+  
+  resources:
+    limits:
+      cpu: 1000m
+      memory: 1Gi
+    requests:
+      cpu: 500m
+      memory: 512Mi
+  
+  config:
+    jwt:
+      secretKey: "${JWT_SECRET_KEY}"
+      algorithm: "HS256"
+      accessTokenExpireMinutes: 30
+  
+  ingress:
+    enabled: true
+    className: nginx
+    annotations:
+      nginx.ingress.kubernetes.io/rewrite-target: /
+      cert-manager.io/cluster-issuer: letsencrypt-prod
+    hosts:
+      - host: api.money.example.com
+        paths:
+          - path: /
+            pathType: Prefix
+    tls:
+      - secretName: api-money-tls
+        hosts:
+          - api.money.example.com
+  
+  frontend:
+    enabled: true
+    replicaCount: 3
+    
+    resources:
+      limits:
+        cpu: 500m
+        memory: 512Mi
+      requests:
+        cpu: 200m
+        memory: 256Mi
+    
+    config:
+      apiBaseUrl: "https://api.money.example.com/api/v1"
+      env: "production"
+    
+    ingress:
+      enabled: true
+      className: nginx
+      annotations:
+        cert-manager.io/cluster-issuer: letsencrypt-prod
+      hosts:
+        - host: money.example.com
+          paths:
+            - path: /
+              pathType: Prefix
+      tls:
+        - secretName: money-tls
+          hosts:
+            - money.example.com
+
+# Production database configuration
+mongodb:
+  architecture: replicaset
+  replicaCount: 3
+  persistence:
+    size: 50Gi
+  metrics:
+    enabled: true
+  
+  backup:
+    enabled: true
+    cronjob:
+      schedule: "0 1 * * *"
+    destination: s3://backups/mongodb
+    s3:
+      existingSecret: backup-s3-secret
+
+# Redis configuration for production
+redis:
+  architecture: replicaset
+  replicaCount: 3
+  master:
+    persistence:
+      size: 20Gi
+  metrics:
+    enabled: true
+
+# Production auto-scaling configuration
+aichat-bot:
+  autoscaling:
+    enabled: true
+    minReplicas: 3
+    maxReplicas: 10
+    targetCPUUtilizationPercentage: 75
+    targetMemoryUtilizationPercentage: 75
+
+calculate-money:
+  autoscaling:
+    enabled: true
+    minReplicas: 3
+    maxReplicas: 10
+    targetCPUUtilizationPercentage: 75
+    targetMemoryUtilizationPercentage: 75
+  
+  frontend:
+    autoscaling:
+      enabled: true
+      minReplicas: 3
+      maxReplicas: 8
+      targetCPUUtilizationPercentage: 75
+
+# Enable metrics and monitoring
+metrics:
+  enabled: true
+  serviceMonitor:
+    enabled: true

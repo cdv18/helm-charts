@@ -1,0 +1,15 @@
+apiVersion: v2
+name: aichat-bot
+description: AI Chatbot with category management integration
+version: 0.1.0
+type: application
+
+dependencies:
+  - name: mongodb
+    version: "12.1.31"
+    repository: "https://charts.bitnami.com/bitnami"
+    condition: mongodb.enabled
+  - name: redis
+    version: "17.11.3"
+    repository: "https://charts.bitnami.com/bitnami"
+    condition: redis.enabled

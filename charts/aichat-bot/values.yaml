@@ -1,0 +1,98 @@
+# Default values for aichat-bot
+replicaCount: 1
+
+image:
+  repository: your-registry/aichat-bot
+  pullPolicy: IfNotPresent
+  tag: "latest"
+
+imagePullSecrets: []
+nameOverride: ""
+fullnameOverride: ""
+
+serviceAccount:
+  create: true
+  annotations: {}
+  name: ""
+
+podAnnotations: {}
+
+podSecurityContext: {}
+
+securityContext: {}
+
+service:
+  type: ClusterIP
+  port: 8001
+
+ingress:
+  enabled: false
+  className: ""
+  annotations: {}
+  hosts:
+    - host: chart-example.local
+      paths:
+        - path: /
+          pathType: ImplementationSpecific
+  tls: []
+
+resources:
+  limits:
+    cpu: 500m
+    memory: 512Mi
+  requests:
+    cpu: 200m
+    memory: 256Mi
+
+autoscaling:
+  enabled: false
+  minReplicas: 1
+  maxReplicas: 100
+  targetCPUUtilizationPercentage: 80
+
+nodeSelector: {}
+
+tolerations: []
+
+affinity: {}
+
+# Application specific configurations
+config:
+  calculateMoney:
+    apiUrl: "http://calculate-money-service:8000/api/v1"
+    timeoutSeconds: 30
+  
+  llm:
+    model: "gemini-pro"
+    temperature: 0.7
+    maxTokens: 1000
+
+# MongoDB configuration
+mongodb:
+  enabled: true
+  auth:
+    enabled: true
+    rootPassword: "changeme"
+    username: "aichat"
+    password: "changeme"
+    database: "aichat"
+  
+  architecture: standalone
+  
+  persistence:
+    enabled: true
+    size: 10Gi
+
+# Redis configuration  
+redis:
+  enabled: true
+  architecture: standalone
+  
+  auth:
+    enabled: true
+    password: "changeme"
+  
+  master:
+    persistence:
+      enabled: true
+      size: 5Gi

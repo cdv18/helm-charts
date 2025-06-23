@@ -1,0 +1,11 @@
+apiVersion: v2
+name: calculate-money
+description: Money management system with expense tracking and reporting
+version: 0.1.0
+type: application
+
+dependencies:
+  - name: mongodb
+    version: "12.1.31"
+    repository: "https://charts.bitnami.com/bitnami"
+    condition: mongodb.enabled

@@ -1,0 +1,124 @@
+# Default values for calculate-money
+replicaCount: 1
+
+image:
+  repository: your-registry/calculate-money
+  pullPolicy: IfNotPresent
+  tag: "latest"
+
+imagePullSecrets: []
+nameOverride: ""
+fullnameOverride: ""
+
+serviceAccount:
+  create: true
+  annotations: {}
+  name: ""
+
+podAnnotations: {}
+
+podSecurityContext: {}
+
+securityContext: {}
+
+service:
+  type: ClusterIP
+  port: 8000
+
+ingress:
+  enabled: false
+  className: ""
+  annotations: {}
+  hosts:
+    - host: chart-example.local
+      paths:
+        - path: /
+          pathType: ImplementationSpecific
+  tls: []
+
+resources:
+  limits:
+    cpu: 500m
+    memory: 512Mi
+  requests:
+    cpu: 200m
+    memory: 256Mi
+
+autoscaling:
+  enabled: false
+  minReplicas: 1
+  maxReplicas: 100
+  targetCPUUtilizationPercentage: 80
+  targetMemoryUtilizationPercentage: 80
+
+nodeSelector: {}
+
+tolerations: []
+
+affinity: {}
+
+# Application specific configurations
+config:
+  jwt:
+    secretKey: "your-secret-key-here"
+    algorithm: "HS256"
+    accessTokenExpireMinutes: 30
+  
+  server:
+    host: "0.0.0.0"
+    port: 8000
+    cors:
+      allowOrigins: ["*"]
+      allowMethods: ["*"]
+      allowHeaders: ["*"]
+
+# MongoDB configuration
+mongodb:
+  enabled: true
+  auth:
+    enabled: true
+    rootPassword: "changeme"
+    username: "money"
+    password: "changeme"
+    database: "money_calculator"
+  
+  architecture: standalone
+  
+  persistence:
+    enabled: true
+    size: 10Gi
+
+# Frontend configuration for Vue.js app
+frontend:
+  enabled: true
+  image:
+    repository: your-registry/calculate-money-frontend
+    tag: latest
+    pullPolicy: IfNotPresent
+  
+  service:
+    type: ClusterIP
+    port: 80
+  
+  ingress:
+    enabled: false
+    className: ""
+    annotations: {}
+    hosts:
+      - host: money.example.com
+        paths:
+          - path: /
+            pathType: Prefix
+    tls: []
+  
+  resources:
+    limits:
+      cpu: 200m
+      memory: 256Mi
+    requests:
+      cpu: 100m
+      memory: 128Mi
+  
+  config:
+    apiBaseUrl: "/api/v1"
+    env: "production"
